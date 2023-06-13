@@ -43,7 +43,7 @@ class WallFollower:
 
     def get_scan(self, data):
         # Convert polar to Cartesian
-        distances = np.array(data.ranges)
+        distances = np.array(data.ranges) #len 1081
         angles = np.linspace(data.angle_min, data.angle_max, num=len(data.ranges))
         xs = distances * np.cos(angles)
         ys = distances * np.sin(angles)
@@ -56,7 +56,7 @@ class WallFollower:
             i = [(self.angle_min >= angles) & (angles >= self.angle_max)]
         # Weight by distance
         if xs is not None and ys is not None:
-            [m, b] = np.polyfit(xs[i], ys[i], 1, w= (self.VELOCITY +np.square(angles[i]))/np.square(distances[i]))
+            [m, b] = np.polyfit(xs[i], ys[i], 1, w= (self.VELOCITY +1/(1+abs(np.square(angles[i]))))/np.square(distances[i]))
             self.control([m, b])
 
             y = m * xs[i] +  b

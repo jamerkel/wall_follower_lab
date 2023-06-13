@@ -29,18 +29,19 @@ class SafetyController:
         angles = np.linspace(msg.angle_min, msg.angle_max, num=len(dist))
         d_theta = (angles[-1]-angles[0])/len(angles)
         weight = np.reciprocal(dist)
-        front = np.split(dist, 5)[2]
+        front = np.split(dist[1:], 5)[2]
         
+        smallest_values = np.partition(front, 5)[:5]
 
-        if min(dist) < self.SAFE_DISTANCE:
-            self.will_crash = True
+        if max(smallest_values) < self.SAFE_DISTANCE:
+            #self.will_crash = True
 
-        if self.will_crash == True:
+        #if self.will_crash == True:
 
             #publish override
             override = AckermannDriveStamped()
             override.header.stamp = rospy.Time.now()
-            override.drive.speed = 0#self.VELOCITY
+            override.drive.speed = 0. #self.VELOCITY
             override.drive.steering_angle = 0 #TODO calculate avoidance angle
             self.safety_pub.publish(override)
 
